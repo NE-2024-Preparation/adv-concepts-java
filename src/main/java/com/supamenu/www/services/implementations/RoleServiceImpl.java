@@ -2,12 +2,16 @@ package com.supamenu.www.services.implementations;
 
 import com.supamenu.www.dtos.response.ApiResponse;
 import com.supamenu.www.dtos.role.CreateRoleDTO;
+import com.supamenu.www.dtos.role.RoleResponseDTO;
+import com.supamenu.www.dtos.role.RolesResponseDTO;
 import com.supamenu.www.enumerations.user.EUserRole;
 import com.supamenu.www.exceptions.*;
 import com.supamenu.www.models.Role;
 import com.supamenu.www.repositories.IRoleRepository;
 import com.supamenu.www.services.interfaces.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,7 +45,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<Role>> createRole(CreateRoleDTO createRoleDTO) {
+    public ResponseEntity<ApiResponse<RoleResponseDTO>> createRole(CreateRoleDTO createRoleDTO) {
         try {
 
             Optional<Role> optionalRole = roleRepository.findRoleByName(createRoleDTO.getName());
@@ -50,7 +54,7 @@ public class RoleServiceImpl implements RoleService {
             } else {
                 Role role = new Role(createRoleDTO.getName());
                 roleRepository.save(role);
-                return ApiResponse.success("Role created successfully", HttpStatus.CREATED, role);
+                return ApiResponse.success("Role created successfully", HttpStatus.CREATED, new RoleResponseDTO(role));
             }
         } catch (Exception exception) {
             throw new CustomException(exception);
@@ -58,10 +62,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<List<Role>>> getAllRoles() {
+    public ResponseEntity<ApiResponse<RolesResponseDTO>> getRoles(Pageable pageable) {
         try {
-            List<Role> roles = roleRepository.findAll();
-            return ApiResponse.success("Roles fetched successfully", HttpStatus.OK, roles);
+            Page<Role> roles = roleRepository.findAll(pageable);
+            return ApiResponse.success("Roles fetched successfully", HttpStatus.OK, new RolesResponseDTO(roles));
         } catch (Exception e) {
             throw new CustomException(e);
         }

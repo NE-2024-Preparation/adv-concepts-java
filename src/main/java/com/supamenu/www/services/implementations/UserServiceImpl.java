@@ -1,13 +1,13 @@
 package com.supamenu.www.services.implementations;
 
 import com.supamenu.www.dtos.response.ApiResponse;
-import com.supamenu.www.dtos.user.CreateUserDTO;
-import com.supamenu.www.dtos.user.UpdateUserDTO;
-import com.supamenu.www.dtos.user.UserRoleModificationDTO;
+import com.supamenu.www.dtos.user.*;
 import com.supamenu.www.exceptions.*;
 import com.supamenu.www.repositories.IRoleRepository;
 import com.supamenu.www.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,24 +53,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<User>> createUser(CreateUserDTO createUserDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> createUser(CreateUserDTO createUserDTO) {
         try {
             User user = createUserEntity(createUserDTO);
             userRepository.save(user);
-            return ApiResponse.success("Successfully created user", HttpStatus.CREATED, user);
+            return ApiResponse.success("Successfully created user", HttpStatus.CREATED, new UserResponseDTO(user));
         } catch (Exception e) {
             throw new CustomException(e);
         }
     }
 
     @Override
-    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<UsersResponseDTO>> getUsers(Pageable pageable) {
         try {
-            List<User> users = userRepository.findAll();
+            Page<User> users = userRepository.findAll(pageable);
             for (User user : users) {
                 user.setFullName(user.getFirstName() + " " + user.getLastName());
             }
-            return ApiResponse.success("Successfully fetched all users", HttpStatus.OK, users);
+            return ApiResponse.success("Successfully fetched all users", HttpStatus.OK, new UsersResponseDTO(users));
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -78,10 +78,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<User>> getUserById(UUID uuid) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> getUserById(UUID uuid) {
         try {
             User user = findUserById(uuid);
-            return ApiResponse.success("Successfully fetched user", HttpStatus.OK, user);
+            return ApiResponse.success("Successfully fetched user", HttpStatus.OK, new UserResponseDTO(user));
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -93,28 +93,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<User>> updateUser(UUID userId, UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> updateUser(UUID userId, UpdateUserDTO updateUserDTO) {
         try {
             User user = findUserById(userId);
             if (user.getEmail() != null) user.setEmail(updateUserDTO.getEmail());
             if (user.getFirstName() != null) user.setFirstName(updateUserDTO.getFirstName());
             if (user.getLastName() != null) user.setLastName(updateUserDTO.getLastName());
             if (user.getUsername() != null) user.setUsername(updateUserDTO.getUsername());
-            return ApiResponse.success("Successfully updated the user", HttpStatus.OK, user);
+            return ApiResponse.success("Successfully updated the user", HttpStatus.OK, new UserResponseDTO(user));
         } catch (Exception e) {
             throw new CustomException(e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ApiResponse<Object>> deleteUser(UUID userId) {
-        try {
-            User user = findUserById(userId);
-            userRepository.deleteById(userId);
-            return ApiResponse.success("Successfully deleted the user", HttpStatus.OK, null);
-        } catch (Exception e) {
-            throw new InternalServerErrorAlertException(e.getMessage());
         }
     }
 
@@ -134,7 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<User>> addRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> addRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
         try {
             User user = findUserById(userId);
             Set<Role> roles = user.getRoles();
@@ -144,14 +132,14 @@ public class UserServiceImpl implements UserService {
             }
             user.setRoles(roles);
             userRepository.save(user);
-            return ApiResponse.success("Successfully added roles to the user", HttpStatus.OK, user);
+            return ApiResponse.success("Successfully added roles to the user", HttpStatus.OK, new UserResponseDTO(user));
         } catch (Exception e) {
             throw new CustomException(e);
         }
     }
 
     @Override
-    public ResponseEntity<ApiResponse<User>> removeRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> removeRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
         try {
             User user = findUserById(userId);
             Set<Role> roles = user.getRoles();
@@ -161,9 +149,21 @@ public class UserServiceImpl implements UserService {
             }
             user.setRoles(roles);
             userRepository.save(user);
-            return ApiResponse.success("Successfully removed roles from the user", HttpStatus.OK, user);
+            return ApiResponse.success("Successfully removed roles from the user", HttpStatus.OK, new UserResponseDTO(user));
         } catch (Exception e) {
             throw new CustomException(e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<Object>> deleteUser(UUID userId) {
+        try {
+            User user = findUserById(userId);
+            userRepository.deleteById(userId);
+            return ApiResponse.success("Successfully deleted the user", HttpStatus.OK, null);
+        } catch (Exception e) {
+            throw new InternalServerErrorAlertException(e.getMessage());
         }
     }
 }
