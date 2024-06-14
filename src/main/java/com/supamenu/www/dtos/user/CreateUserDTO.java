@@ -1,38 +1,22 @@
 package com.supamenu.www.dtos.user;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.supamenu.www.dtos.auth.RegisterUserDTO;
+import lombok.*;
 
-import jakarta.validation.constraints.*;
+import java.util.List;
+import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class CreateUserDTO {
+@EqualsAndHashCode(callSuper = true)
+public class CreateUserDTO extends RegisterUserDTO {
+    private List<UUID> roles;
 
-    @Schema(example = "John")
-    @NotBlank(message = "First name cannot be blank")
-    private String firstName;
-
-    @Schema(example = "Doe")
-    @NotBlank(message = "Last name cannot be blank")
-    private String lastName;
-
-    @Schema(example = "johndoe")
-    @NotBlank(message = "Username cannot be blank")
-    private String username;
-
-    @Schema(example = "example@gmail.com")
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
-    private String email;
-
-    @Schema(example = "password@123")
-    @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
-    private String password;
+    public CreateUserDTO(RegisterUserDTO registerUserDTO) {
+        this.setEmail(registerUserDTO.getEmail());
+        this.setPassword(registerUserDTO.getPassword());
+        this.setUsername(registerUserDTO.getUsername());
+        this.setFirstName(registerUserDTO.getFirstName());
+        this.setLastName(registerUserDTO.getLastName());
+    }
 }

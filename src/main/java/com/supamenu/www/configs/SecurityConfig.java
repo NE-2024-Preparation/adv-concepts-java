@@ -40,14 +40,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userService;
 
-    private static final String[] AUTH_WHITELIST = {
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/v3/api-docs/**",
-            "/api/documents/download/**",
-            "/api/v1/auth/**",
-            "/api/v1/users/create-user",
-    };
+    private static final String[] AUTH_WHITELIST = {"/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/documents/download/**", "/api/v1/auth/**"};
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
@@ -74,19 +67,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().authenticated())
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(unauthorizedHandler)
-                        .accessDeniedHandler(accessDeniedHandler())
-                )
-                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(request -> request.requestMatchers(AUTH_WHITELIST).permitAll().anyRequest().authenticated()).exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler())).sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -109,8 +90,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

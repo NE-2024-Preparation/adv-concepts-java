@@ -2,8 +2,8 @@ package com.supamenu.www.controllers;
 
 import com.supamenu.www.dtos.user.CreateUserDTO;
 import com.supamenu.www.dtos.user.UpdateUserDTO;
-import com.supamenu.www.services.interfaces.UserService;
 import com.supamenu.www.dtos.response.ApiResponse;
+import com.supamenu.www.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ADMIN')")

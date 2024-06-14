@@ -23,5 +23,4 @@ public class BadRequestAlertException extends AbstractThrowableProblem {
         this.entityName = "";
         this.errorKey = String.valueOf(Status.BAD_REQUEST);
     }
-
 }

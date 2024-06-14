@@ -1,7 +1,9 @@
 package com.supamenu.www;
 
 import com.supamenu.www.enumerations.user.EUserRole;
-import com.supamenu.www.services.implementations.RoleServiceImpl;
+import com.supamenu.www.services.interfaces.RoleService;
+import com.supamenu.www.services.interfaces.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,13 +15,10 @@ import java.util.Set;
 
 @SpringBootApplication
 @EnableCaching
+@RequiredArgsConstructor
 public class SpringBootMain {
-    private final RoleServiceImpl roleService;
-
-    @Autowired
-    public SpringBootMain(RoleServiceImpl roleService) {
-        this.roleService = roleService;
-    }
+    private final RoleService roleService;
+    private final UserService userService;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootMain.class, args);
@@ -36,4 +35,11 @@ public class SpringBootMain {
             }
         }
     }
+
+//    @Bean
+//    public void registerAdminUser() {
+//        if (!this.roleService.isRolePresent(EUserRole.ADMIN)) {
+//
+//        }
+//    }
 }

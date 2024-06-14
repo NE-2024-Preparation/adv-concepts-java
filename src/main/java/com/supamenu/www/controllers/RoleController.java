@@ -3,7 +3,7 @@ package com.supamenu.www.controllers;
 import com.supamenu.www.dtos.response.ApiResponse;
 import com.supamenu.www.dtos.role.CreateRoleDTO;
 import com.supamenu.www.models.Role;
-import com.supamenu.www.services.implementations.RoleServiceImpl;
+import com.supamenu.www.services.interfaces.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/roles")
 @RequiredArgsConstructor
 public class RoleController {
-    private final RoleServiceImpl roleService;
+    private final RoleService roleService;
 
     @PostMapping("/create-role")
     public ResponseEntity<ApiResponse<Role>> createRole(@Valid @RequestBody CreateRoleDTO createRoleDTO) {

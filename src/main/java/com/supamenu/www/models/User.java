@@ -46,13 +46,7 @@ public class User extends Base {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private EUserStatus status = EUserStatus.WAIT_EMAIL_VERIFICATION;
-
-    @Column(name = "verified")
-    private boolean verified;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<OTP> otps;
+    private EUserStatus status = EUserStatus.ACTIVE;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -63,6 +57,5 @@ public class User extends Base {
         this.email = email;
         this.password = password;
         this.status = status;
-        this.verified = verified;
     }
 }

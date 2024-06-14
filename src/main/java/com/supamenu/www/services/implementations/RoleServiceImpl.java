@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
             try {
                 roleRepository.save(role);
             } catch (Exception e) {
-                throw new InternalServerErrorException(e.getMessage());
+                throw new InternalServerErrorAlertException(e.getMessage());
             }
         }
     }
@@ -46,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
 
             Optional<Role> optionalRole = roleRepository.findRoleByName(createRoleDTO.getName());
             if (optionalRole.isPresent()) {
-                throw new DuplicateRecordException("The role already exists");
+                throw new ConflictAlertException("The role already exists");
             } else {
                 Role role = new Role(createRoleDTO.getName());
                 roleRepository.save(role);
@@ -84,7 +84,7 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.deleteById(roleId);
             return role;
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorAlertException(e.getMessage());
         }
     }
 
@@ -93,7 +93,7 @@ public class RoleServiceImpl implements RoleService {
         try {
             return roleRepository.findRoleByName(roleName).isPresent();
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorAlertException(e.getMessage());
         }
     }
 }

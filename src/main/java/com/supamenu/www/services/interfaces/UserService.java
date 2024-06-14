@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
+    public User createUserEntity(CreateUserDTO createUserDTO);
+
+    public User findUserById(UUID userId);
+
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserDTO createUserDTO);
 
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers();

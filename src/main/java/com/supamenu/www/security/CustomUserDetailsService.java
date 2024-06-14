@@ -31,9 +31,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String s) throws BadRequestAlertException {
         User user = userRepository.findUserByEmailOrUsername(s, s).orElseThrow(() -> new UsernameNotFoundException("user not found with email or username of " + s));
-        if (!user.isVerified()) {
-            throw new BadRequestAlertException("User is not verified");
-        }
         if (!user.getStatus().equals(EUserStatus.ACTIVE)) {
             throw new BadRequestAlertException("User is not active");
         }

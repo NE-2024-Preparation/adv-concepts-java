@@ -6,7 +6,6 @@ import com.supamenu.www.dtos.user.UpdateUserDTO;
 import com.supamenu.www.exceptions.*;
 import com.supamenu.www.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import com.supamenu.www.enumerations.user.EUserRole;
 import com.supamenu.www.models.Role;
 import com.supamenu.www.models.User;
 import com.supamenu.www.repositories.IUserRepository;
-import com.supamenu.www.services.interfaces.MailService;
 import com.supamenu.www.utils.HashUtil;
 
 import java.util.*;
@@ -24,38 +22,35 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private IUserRepository userRepository;
-    private RoleServiceImpl roleService;
+    private final IUserRepository userRepository;
+    private final RoleServiceImpl roleService;
 
-    private final MailService mailService;
-
-    @Autowired
-    public UserServiceImpl(IUserRepository userRepository, RoleServiceImpl roleService, MailServiceImpl mailService) {
-        this.userRepository = userRepository;
-        this.roleService = roleService;
-        this.mailService = mailService;
+    @Override
+    public User createUserEntity(CreateUserDTO createUserDTO) {
+        Optional<User> foundUser = userRepository.findUserByEmailOrUsername(createUserDTO.getEmail(), createUserDTO.getUsername());
+        if (foundUser.isPresent())
+            throw new ConflictAlertException("The user with the given email or username already exists");
+        User user = new User();
+        Role role = roleService.getRoleByName(EUserRole.USER);
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setUsername(createUserDTO.getUsername());
+        user.setFirstName(createUserDTO.getFirstName());
+        user.setLastName(createUserDTO.getLastName());
+        user.setStatus(EUserStatus.ACTIVE);
+        user.setEmail(createUserDTO.getEmail());
+        user.setUsername(createUserDTO.getUsername());
+        user.setPassword(HashUtil.hashPassword(createUserDTO.getPassword()));
+        user.setFullName(createUserDTO.getFirstName() + " " + createUserDTO.getLastName());
+        user.setRoles(roles);
+        return user;
     }
 
     @Override
     @Transactional
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserDTO createUserDTO) {
         try {
-            Optional<User> foundUser = userRepository.findUserByEmailOrUsername(createUserDTO.getEmail(), createUserDTO.getUsername());
-            if (foundUser.isPresent())
-                throw new DuplicateRecordException("The user with the given email or username already exists");
-            User user = new User();
-            Role role = roleService.getRoleByName(EUserRole.USER);
-            Set<Role> roles = new HashSet<>();
-            roles.add(role);
-            user.setUsername(createUserDTO.getUsername());
-            user.setFirstName(createUserDTO.getFirstName());
-            user.setLastName(createUserDTO.getLastName());
-            user.setStatus(EUserStatus.ACTIVE);
-            user.setEmail(createUserDTO.getEmail());
-            user.setUsername(createUserDTO.getUsername());
-            user.setPassword(HashUtil.hashPassword(createUserDTO.getPassword()));
-            user.setFullName(createUserDTO.getFirstName() + " " + createUserDTO.getLastName());
-            user.setRoles(roles);
+            User user = createUserEntity(createUserDTO);
             userRepository.save(user);
             return ApiResponse.success(
                     "Successfully created user",
@@ -132,7 +127,7 @@ public class UserServiceImpl implements UserService {
                     null
             );
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorAlertException(e.getMessage());
         }
     }
 }
