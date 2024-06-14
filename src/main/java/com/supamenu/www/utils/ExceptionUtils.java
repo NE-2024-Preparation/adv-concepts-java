@@ -10,7 +10,6 @@ import org.springframework.security.authentication.InternalAuthenticationService
 
 public class ExceptionUtils {
     public static ResponseEntity<ApiResponse<Object>> handleResponseException(Exception e) {
-        System.out.println("Exception: " + e.getMessage());
         if (e instanceof NotFoundException) {
             return ApiResponse.error(
                     e.getMessage(),
@@ -22,12 +21,6 @@ public class ExceptionUtils {
             return ApiResponse.error(
                     e.getMessage(),
                     HttpStatus.CONFLICT,
-                    null
-            );
-        } else if (e instanceof InvalidUUIDException) {
-            return ApiResponse.error(
-                    e.getMessage(),
-                    HttpStatus.BAD_REQUEST,
                     null
             );
         } else if (e instanceof InternalServerErrorAlertException) {

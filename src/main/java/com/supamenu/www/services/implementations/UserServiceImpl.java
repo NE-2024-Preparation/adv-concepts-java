@@ -8,6 +8,8 @@ import com.supamenu.www.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.supamenu.www.enumerations.user.EUserStatus;
@@ -52,11 +54,7 @@ public class UserServiceImpl implements UserService {
         try {
             User user = createUserEntity(createUserDTO);
             userRepository.save(user);
-            return ApiResponse.success(
-                    "Successfully created user",
-                    HttpStatus.CREATED,
-                    user
-            );
+            return ApiResponse.success("Successfully created user", HttpStatus.CREATED, user);
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -69,11 +67,7 @@ public class UserServiceImpl implements UserService {
             for (User user : users) {
                 user.setFullName(user.getFirstName() + " " + user.getLastName());
             }
-            return ApiResponse.success(
-                    "Successfully fetched all users",
-                    HttpStatus.OK,
-                    users
-            );
+            return ApiResponse.success("Successfully fetched all users", HttpStatus.OK, users);
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -84,11 +78,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<ApiResponse<User>> getUserById(UUID uuid) {
         try {
             User user = findUserById(uuid);
-            return ApiResponse.success(
-                    "Successfully fetched user",
-                    HttpStatus.OK,
-                    user
-            );
+            return ApiResponse.success("Successfully fetched user", HttpStatus.OK, user);
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -105,11 +95,7 @@ public class UserServiceImpl implements UserService {
             User user = findUserById(userId);
             user.setEmail(updateUserDTO.getEmail());
             user.setUsername(updateUserDTO.getUsername());
-            return ApiResponse.success(
-                    "Successfully updated the user",
-                    HttpStatus.OK,
-                    user
-            );
+            return ApiResponse.success("Successfully updated the user", HttpStatus.OK, user);
         } catch (Exception e) {
             throw new CustomException(e);
         }
@@ -121,13 +107,23 @@ public class UserServiceImpl implements UserService {
         try {
             User user = findUserById(userId);
             userRepository.deleteById(userId);
-            return ApiResponse.success(
-                    "Successfully deleted the user",
-                    HttpStatus.OK,
-                    null
-            );
+            return ApiResponse.success("Successfully deleted the user", HttpStatus.OK, null);
         } catch (Exception e) {
             throw new InternalServerErrorAlertException(e.getMessage());
         }
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        String username;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        User user = userRepository.findUserByUsername(username).orElseThrow(() -> new NotFoundException("User Not Found"));
+        user.setFullName(user.getFirstName() + " " + user.getLastName());
+        return user;
     }
 }

@@ -8,4 +8,8 @@ public class HashUtil {
     public static String hashPassword(String password) {
         return bCryptPasswordEncoder.encode(password);
     }
+
+    public static boolean verifyPassword(String rawPassword, String hashedPassword) {
+        return bCryptPasswordEncoder.matches(rawPassword, hashedPassword);
+    }
 }

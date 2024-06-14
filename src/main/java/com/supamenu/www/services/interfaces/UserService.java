@@ -14,6 +14,8 @@ public interface UserService {
 
     public User findUserById(UUID userId);
 
+    public User getLoggedInUser();
+
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserDTO createUserDTO);
 
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers();

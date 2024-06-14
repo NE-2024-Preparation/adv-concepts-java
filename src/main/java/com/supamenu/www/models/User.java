@@ -5,6 +5,7 @@ import com.supamenu.www.enumerations.user.EUserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.Set;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -39,6 +41,10 @@ public class User extends Base {
 
     @Transient
     private String fullName;
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 
     @JsonIgnore
     @Column(name = "password", nullable = true)
