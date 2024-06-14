@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,13 +31,13 @@ public class RoleServiceImpl implements RoleService {
     public void createRole(EUserRole roleName) {
         Optional<Role> optionalRole = roleRepository.findRoleByName(roleName);
         if (optionalRole.isPresent()) {
-            throw new BadRequestAlertException("The role already exists");
+            throw new BadRequestException("The role already exists");
         } else {
             Role role = new Role(roleName);
             try {
                 roleRepository.save(role);
             } catch (Exception e) {
-                throw new InternalServerErrorAlertException(e.getMessage());
+                throw new InternalServerErrorException(e.getMessage());
             }
         }
     }
@@ -50,7 +49,7 @@ public class RoleServiceImpl implements RoleService {
 
             Optional<Role> optionalRole = roleRepository.findRoleByName(createRoleDTO.getName());
             if (optionalRole.isPresent()) {
-                throw new ConflictAlertException("The role already exists");
+                throw new ConflictException("The role already exists");
             } else {
                 Role role = new Role(createRoleDTO.getName());
                 roleRepository.save(role);
@@ -88,7 +87,7 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.deleteById(roleId);
             return role;
         } catch (Exception e) {
-            throw new InternalServerErrorAlertException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 
@@ -97,7 +96,7 @@ public class RoleServiceImpl implements RoleService {
         try {
             return roleRepository.findRoleByName(roleName).isPresent();
         } catch (Exception e) {
-            throw new InternalServerErrorAlertException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 }

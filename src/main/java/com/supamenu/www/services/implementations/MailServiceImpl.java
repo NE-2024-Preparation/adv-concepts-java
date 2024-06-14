@@ -1,7 +1,7 @@
 package com.supamenu.www.services.implementations;
 
-import com.supamenu.www.exceptions.BadRequestAlertException;
-import com.supamenu.www.exceptions.InternalServerErrorAlertException;
+import com.supamenu.www.exceptions.BadRequestException;
+import com.supamenu.www.exceptions.InternalServerErrorException;
 import com.supamenu.www.services.interfaces.MailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -34,9 +34,9 @@ public class MailServiceImpl implements MailService {
             helper.setText(content, isHtmlContent);
             mailSender.send(message);
         } catch (MessagingException exception) {
-            throw new BadRequestAlertException("Failed To Send Email: " + exception.getMessage());
+            throw new BadRequestException("Failed To Send Email: " + exception.getMessage());
         } catch (Exception e) {
-            throw new InternalServerErrorAlertException("An error occurred while sending email");
+            throw new InternalServerErrorException("An error occurred while sending email");
         }
     }
 }

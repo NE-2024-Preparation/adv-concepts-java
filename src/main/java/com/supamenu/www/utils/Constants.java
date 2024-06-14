@@ -1,6 +1,6 @@
 package com.supamenu.www.utils;
 
-import com.supamenu.www.exceptions.BadRequestAlertException;
+import com.supamenu.www.exceptions.BadRequestException;
 
 public interface Constants {
     /**
@@ -29,11 +29,11 @@ public interface Constants {
      */
     public static void validatePageNumberAndSize(int pageNumber, int pageSize) {
         if (pageNumber < 0) {
-            throw new BadRequestAlertException("Page number is less than zero.");
+            throw new BadRequestException("Page number is less than zero.");
         }
 
         if (pageSize > Constants.MAX_PAGE_SIZE) {
-            throw new BadRequestAlertException("Page size is greater than " + Constants.MAX_PAGE_SIZE);
+            throw new BadRequestException("Page size is greater than " + Constants.MAX_PAGE_SIZE);
         }
     }
 }

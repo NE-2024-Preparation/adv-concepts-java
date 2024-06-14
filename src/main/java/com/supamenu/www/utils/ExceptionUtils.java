@@ -17,19 +17,19 @@ public class ExceptionUtils {
                     null
             );
         }
-        if (e instanceof ConflictAlertException) {
+        if (e instanceof ConflictException) {
             return ApiResponse.error(
                     e.getMessage(),
                     HttpStatus.CONFLICT,
                     null
             );
-        } else if (e instanceof InternalServerErrorAlertException) {
+        } else if (e instanceof InternalServerErrorException) {
             return ApiResponse.error(
                     e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     null
             );
-        } else if (e instanceof BadRequestAlertException || e instanceof InternalAuthenticationServiceException || e instanceof BadCredentialsException || e instanceof AccessDeniedException) {
+        } else if (e instanceof BadRequestException || e instanceof InternalAuthenticationServiceException || e instanceof BadCredentialsException || e instanceof AccessDeniedException) {
             return ApiResponse.error(
                     e.getMessage(),
                     HttpStatus.BAD_REQUEST,

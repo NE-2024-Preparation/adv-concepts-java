@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     public User createUserEntity(CreateUserDTO createUserDTO) {
         Optional<User> foundUser = userRepository.findUserByEmailOrUsername(createUserDTO.getEmail(), createUserDTO.getUsername());
         if (foundUser.isPresent())
-            throw new ConflictAlertException("The user with the given email or username already exists");
+            throw new ConflictException("The user with the given email or username already exists");
         User user = new User();
         Role role = roleService.getRoleByName(EUserRole.USER);
         Set<Role> roles = new HashSet<>();
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(userId);
             return ApiResponse.success("Successfully deleted the user", HttpStatus.OK, null);
         } catch (Exception e) {
-            throw new InternalServerErrorAlertException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 }

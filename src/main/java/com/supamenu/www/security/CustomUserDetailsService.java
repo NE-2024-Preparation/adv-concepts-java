@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.supamenu.www.exceptions.BadRequestAlertException;
+import com.supamenu.www.exceptions.BadRequestException;
 import com.supamenu.www.models.User;
 
 import java.util.UUID;
@@ -29,10 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Transactional
-    public UserDetails loadUserByUsername(String s) throws BadRequestAlertException {
+    public UserDetails loadUserByUsername(String s) throws BadRequestException {
         User user = userRepository.findUserByEmailOrUsername(s, s).orElseThrow(() -> new UsernameNotFoundException("user not found with email or username of " + s));
         if (!user.getStatus().equals(EUserStatus.ACTIVE)) {
-            throw new BadRequestAlertException("User is not active");
+            throw new BadRequestException("User is not active");
         }
         return UserPrincipal.create(user);
     }
