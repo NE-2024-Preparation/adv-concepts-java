@@ -48,7 +48,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword());
             Authentication authentication = authenticationProvider.authenticate(authRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            jwt = jwtTokenProvider.generateToken(authentication);
+            jwt = jwtTokenProvider.generateAccessToken(authentication);
             userPrincipal = UserUtils.getLoggedInUser();
             user = userService.findUserById(userPrincipal.getId());
             return ApiResponse.success("Successfully logged in", HttpStatus.OK, new JWTAuthenticationResponse(jwt, user));
@@ -87,7 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 userRepository.save(user);
                 otpRepository.save(otp);
                 Context context = new Context();
-                context.setVariable("name", user.getFirstName());
+                context.setVariable("firstName", user.getFirstName());
                 String content = templateEngine.process("verification-success-email", context);
                 mailService.sendEmail(user.getEmail(), "Account Verified", content, true);
                 return ApiResponse.success("Account verified successfully", HttpStatus.OK, null);

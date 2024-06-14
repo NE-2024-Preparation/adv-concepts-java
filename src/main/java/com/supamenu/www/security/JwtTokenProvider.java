@@ -1,5 +1,6 @@
 package com.supamenu.www.security;
 
+import com.supamenu.www.exceptions.CustomException;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,28 +22,26 @@ public class JwtTokenProvider {
     @Value("${jwt.expiresIn}")
     private int jwtExpirationInMs;
 
-    public String generateToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-        List<String> roles = userPrincipal.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
+    public String generateAccessToken(Authentication authentication) {
         try {
-            String jwt = Jwts.builder()
+
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            Date now = new Date();
+            Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+            List<String> roles = userPrincipal.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+            return Jwts.builder()
                     .setId(userPrincipal.getId() + "")
                     .setSubject(userPrincipal.getId() + "")
                     .claim("user", userPrincipal)
-                    .claim("roles", roles) // Include roles in the claim
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(expiryDate)
                     .signWith(SignatureAlgorithm.HS512, jwtSecret)
                     .compact();
-            return jwt;
         } catch (Exception e) {
-            return null;
+            throw new CustomException(e);
         }
     }
 
