@@ -1,18 +1,25 @@
 package com.supamenu.www.dtos.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdateUserDTO {
+    @Schema(example = "John")
+    private String firstName;
+
+    @Schema(example = "Doe")
+    private String lastName;
+
+    @Schema(example = "johndoe")
     private String username;
-    private String phoneNumber;
+
+    @Schema(example = "example@gmail.com")
+    @Email(message = "Invalid email format")
     private String email;
-    private String gender;
-    private String password;
 }
+

@@ -3,7 +3,9 @@ package com.supamenu.www.services.implementations;
 import com.supamenu.www.dtos.response.ApiResponse;
 import com.supamenu.www.dtos.user.CreateUserDTO;
 import com.supamenu.www.dtos.user.UpdateUserDTO;
+import com.supamenu.www.dtos.user.UserRoleModificationDTO;
 import com.supamenu.www.exceptions.*;
+import com.supamenu.www.repositories.IRoleRepository;
 import com.supamenu.www.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final IUserRepository userRepository;
     private final RoleServiceImpl roleService;
+    private final IRoleRepository roleRepository;
 
     @Override
     public User createUserEntity(CreateUserDTO createUserDTO) {
@@ -93,8 +96,10 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<ApiResponse<User>> updateUser(UUID userId, UpdateUserDTO updateUserDTO) {
         try {
             User user = findUserById(userId);
-            user.setEmail(updateUserDTO.getEmail());
-            user.setUsername(updateUserDTO.getUsername());
+            if (user.getEmail() != null) user.setEmail(updateUserDTO.getEmail());
+            if (user.getFirstName() != null) user.setFirstName(updateUserDTO.getFirstName());
+            if (user.getLastName() != null) user.setLastName(updateUserDTO.getLastName());
+            if (user.getUsername() != null) user.setUsername(updateUserDTO.getUsername());
             return ApiResponse.success("Successfully updated the user", HttpStatus.OK, user);
         } catch (Exception e) {
             throw new CustomException(e);
@@ -125,5 +130,40 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserByUsername(username).orElseThrow(() -> new NotFoundException("User Not Found"));
         user.setFullName(user.getFirstName() + " " + user.getLastName());
         return user;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<User>> addRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
+        try {
+            User user = findUserById(userId);
+            Set<Role> roles = user.getRoles();
+            for (UUID roleId : userRoleModificationDTO.getRoles()) {
+                Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("Role not found"));
+                roles.add(role);
+            }
+            user.setRoles(roles);
+            userRepository.save(user);
+            return ApiResponse.success("Successfully added roles to the user", HttpStatus.OK, user);
+        } catch (Exception e) {
+            throw new CustomException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<User>> removeRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO) {
+        try {
+            User user = findUserById(userId);
+            Set<Role> roles = user.getRoles();
+            for (UUID roleId : userRoleModificationDTO.getRoles()) {
+                Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("Role not found"));
+                roles.remove(role);
+            }
+            user.setRoles(roles);
+            userRepository.save(user);
+            return ApiResponse.success("Successfully removed roles from the user", HttpStatus.OK, user);
+        } catch (Exception e) {
+            throw new CustomException(e);
+        }
     }
 }

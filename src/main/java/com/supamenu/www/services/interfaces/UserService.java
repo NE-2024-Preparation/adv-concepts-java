@@ -3,6 +3,7 @@ package com.supamenu.www.services.interfaces;
 import com.supamenu.www.dtos.response.ApiResponse;
 import com.supamenu.www.dtos.user.CreateUserDTO;
 import com.supamenu.www.dtos.user.UpdateUserDTO;
+import com.supamenu.www.dtos.user.UserRoleModificationDTO;
 import com.supamenu.www.models.User;
 import org.springframework.http.ResponseEntity;
 
@@ -25,4 +26,8 @@ public interface UserService {
     public ResponseEntity<ApiResponse<User>> updateUser(UUID userId, UpdateUserDTO updateUserDTO);
 
     public ResponseEntity<ApiResponse<Object>> deleteUser(UUID userId);
+
+    public ResponseEntity<ApiResponse<User>> addRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO);
+
+    public ResponseEntity<ApiResponse<User>> removeRoles(UUID userId, UserRoleModificationDTO userRoleModificationDTO);
 }

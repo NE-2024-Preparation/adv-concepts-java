@@ -3,7 +3,9 @@ package com.supamenu.www.controllers;
 import com.supamenu.www.dtos.user.CreateUserDTO;
 import com.supamenu.www.dtos.user.UpdateUserDTO;
 import com.supamenu.www.dtos.response.ApiResponse;
+import com.supamenu.www.dtos.user.UserRoleModificationDTO;
 import com.supamenu.www.services.interfaces.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,5 +46,15 @@ public class UserController {
     @DeleteMapping("/delete-user/{userId}")
     public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable UUID userId) {
         return userService.deleteUser(userId);
+    }
+
+    @PatchMapping("/add-roles/{userId}")
+    public ResponseEntity<ApiResponse<User>> addRoles(@Valid @PathVariable("userId") UUID userId, @Valid @RequestBody UserRoleModificationDTO userRoleModificationDTO) {
+        return userService.addRoles(userId, userRoleModificationDTO);
+    }
+
+    @PatchMapping("/remove-roles/{userId}")
+    public ResponseEntity<ApiResponse<User>> removeRoles(@Valid @PathVariable("userId") UUID userId, @Valid @RequestBody UserRoleModificationDTO userRoleModificationDTO) {
+        return userService.removeRoles(userId, userRoleModificationDTO);
     }
 }
