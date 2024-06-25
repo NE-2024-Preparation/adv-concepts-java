@@ -1,8 +1,6 @@
 package com.supamenu.www.controllers;
 
-import com.supamenu.www.dtos.profile.ChangePasswordRequestDTO;
-import com.supamenu.www.dtos.profile.ProfileResponseDTO;
-import com.supamenu.www.dtos.profile.UpdateProfileRequestDTO;
+import com.supamenu.www.dtos.profile.*;
 import com.supamenu.www.dtos.response.ApiResponse;
 import com.supamenu.www.services.interfaces.ProfileService;
 import jakarta.validation.Valid;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/profile")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority('USER')")
 public class ProfileController {
     private final ProfileService profileService;
 
@@ -32,5 +29,11 @@ public class ProfileController {
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> changePassword(@Valid @RequestBody ChangePasswordRequestDTO
                                                                                   changePasswordRequestDTO) {
         return profileService.changePassword(changePasswordRequestDTO);
+    }
+
+    @PostMapping("/request-reset-password")
+    public ResponseEntity<ApiResponse<Object>> requestResetPassword(@Valid @RequestBody RequestResetPasswordRequestDTO
+                                                                                  requestResetPasswordRequestDTO) {
+        return profileService.requestResetPassword(requestResetPasswordRequestDTO);
     }
 }

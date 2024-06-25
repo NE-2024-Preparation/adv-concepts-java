@@ -160,6 +160,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<ApiResponse<Object>> deleteUser(UUID userId) {
         try {
             User user = findUserById(userId);
+            if(user == null) throw new NotFoundException("User not found");
             userRepository.deleteById(userId);
             return ApiResponse.success("Successfully deleted the user", HttpStatus.OK, null);
         } catch (Exception e) {

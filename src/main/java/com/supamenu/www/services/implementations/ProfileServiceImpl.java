@@ -1,12 +1,12 @@
 package com.supamenu.www.services.implementations;
 
-import com.supamenu.www.dtos.profile.ChangePasswordRequestDTO;
-import com.supamenu.www.dtos.profile.ProfileResponseDTO;
-import com.supamenu.www.dtos.profile.UpdateProfileRequestDTO;
+import com.supamenu.www.dtos.profile.*;
 import com.supamenu.www.dtos.response.ApiResponse;
+import com.supamenu.www.exceptions.BadRequestException;
 import com.supamenu.www.exceptions.CustomException;
 import com.supamenu.www.models.User;
 import com.supamenu.www.repositories.IUserRepository;
+import com.supamenu.www.services.interfaces.MailService;
 import com.supamenu.www.services.interfaces.ProfileService;
 import com.supamenu.www.services.interfaces.UserService;
 import com.supamenu.www.utils.HashUtil;
@@ -14,12 +14,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
     private final UserService userService;
     private final IUserRepository userRepository;
+    private final TemplateEngine templateEngine;
+    private final MailService mailService;
 
     @Override
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> getProfile() {
@@ -76,6 +80,22 @@ public class ProfileServiceImpl implements ProfileService {
                     new ProfileResponseDTO(user)
             );
         } catch (Exception e) {
+            throw new CustomException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<Object>> requestResetPassword(RequestResetPasswordRequestDTO requestResetPasswordRequestDTO) {
+        try {
+            User user = userRepository.findUserByEmail(requestResetPasswordRequestDTO.getEmail()).orElseThrow(() -> new BadRequestException("User with provided email not found"));
+            int otpDuration = 20; // 20 minutes
+            Context context = new Context();
+            context.setVariable("firstName", user.getFirstName());
+            context.setVariable("otp", 123456);
+            String content = templateEngine.process("verification-email", context);
+            mailService.sendEmail(user.getEmail(), "Verification Email", content, true);
+            return ApiResponse.success("We've sent reset code to your email!", HttpStatus.OK, null);
+        }catch (Exception e) {
             throw new CustomException(e);
         }
     }

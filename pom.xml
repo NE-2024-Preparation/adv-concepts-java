@@ -50,6 +50,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <!--		added dependencies-->
         <dependency>
             <groupId>org.testng</groupId>
